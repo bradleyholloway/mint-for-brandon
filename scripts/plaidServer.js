@@ -44,12 +44,41 @@ function saveAccessToken(token) {
   console.log()
 }
 
+app.post('/create_link_token', async function(request, response, next) {
+  const token_request = {
+    user: {
+      client_user_id: 'user-id',
+    },
+    client_name: 'Personal Finance App',
+    products: ['transactions'],
+    country_codes: ['US'],
+    language: 'en',
+  };
+
+  try {
+    const token_response = await client.linkTokenCreate(token_request);
+    const linkToken = token_response.data.link_token;
+    console.log("Successful Link Token: " + linkToken);
+    response.json({
+      link_token: linkToken,
+      error: null,
+    });
+  } catch (error) {
+    // handle error
+    console.log("Link Token Error: " + error);
+    response.json({
+      link_token: null,
+      error: error,
+    });
+  }
+});
+
 // Exchange token flow - exchange a Link public_token for
 // an API access_token
 // https://plaid.com/docs/#exchange-token-flow
 app.post('/get_access_token', function(request, response, next) {
-  PUBLIC_TOKEN = request.body.public_token;
-  client.exchangePublicToken(PUBLIC_TOKEN, function(error, tokenResponse) {
+  var publicToken = request.body.public_token;
+  client.exchangePublicToken(publicToken, function(error, tokenResponse) {
     if (error != null) {
       prettyPrintResponse(error);
       return response.json({

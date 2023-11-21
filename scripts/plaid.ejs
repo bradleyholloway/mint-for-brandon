@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Plaid Link</title>
-<link rel="stylesheet" href="https://threads.plaid.com/threads.css">
-
 <link rel="stylesheet" type="text/css" href="plaid.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -170,17 +168,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script>
-  (function($) {
+  (async function($) {
     var products = ['transactions']
-
+    var linkTokenResponse = await $.post('/create_link_token');
+    console.log("acquired link token: " + linkTokenResponse.link_token);
     var handler = Plaid.create({
-      apiVersion: 'v2',
-      clientName: 'Plaid Quickstart',
-      env: 'development',
-      product: products,
-      key: '<%= PLAID_PUBLIC_KEY %>',
-      // webhook: 'https://your-domain.tld/plaid-webhook',
-      onSuccess: function(public_token) {
+      token: linkTokenResponse.link_token,
+      onSuccess: function(public_token, metadata) {
         $.post('/get_access_token', {
           public_token: public_token
         }, function(data) {
