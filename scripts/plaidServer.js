@@ -79,12 +79,12 @@ app.post('/create_link_token', async function(request, response, next) {
 app.post('/get_access_token', async function(request, response, next) {
   var publicToken = request.body.public_token;
 
-  const request = {
+  const plaid_request = {
     public_token: publicToken,
   };
 
   try {
-    const response = await client.itemPublicTokenExchange(request);
+    const response = await client.itemPublicTokenExchange(plaid_request);
     ACCESS_TOKEN = response.data.access_token;
     ITEM_ID = response.data.item_id;
 
