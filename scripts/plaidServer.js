@@ -76,25 +76,33 @@ app.post('/create_link_token', async function(request, response, next) {
 // Exchange token flow - exchange a Link public_token for
 // an API access_token
 // https://plaid.com/docs/#exchange-token-flow
-app.post('/get_access_token', function(request, response, next) {
+app.post('/get_access_token', async function(request, response, next) {
   var publicToken = request.body.public_token;
-  client.exchangePublicToken(publicToken, function(error, tokenResponse) {
-    if (error != null) {
-      prettyPrintResponse(error);
-      return response.json({
-        error: error,
-      });
-    }
-    ACCESS_TOKEN = tokenResponse.access_token;
+
+  const request = {
+    public_token: publicToken,
+  };
+
+  try {
+    const response = await client.itemPublicTokenExchange(request);
+    ACCESS_TOKEN = response.data.access_token;
+    ITEM_ID = response.data.item_id;
+
     saveAccessToken(ACCESS_TOKEN)
-    ITEM_ID = tokenResponse.item_id;
     prettyPrintResponse(tokenResponse);
     response.json({
       access_token: ACCESS_TOKEN,
       item_id: ITEM_ID,
       error: null,
     });
-  });
+  } catch (err) {
+    // handle error
+    response.json({
+      access_token: ACCESS_TOKEN,
+      item_id: ITEM_ID,
+      error: err,
+    });
+  }
 });
 
 
