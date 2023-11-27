@@ -8,4 +8,5 @@ const { updateSheet } = require('./lib/update')
   const transactions = await fetchTransactions()
   const updates = transformTransactionsToUpdates(transactions)
   updateSheet(updates)
+  // Open Sheet
 })()
